@@ -69,6 +69,12 @@ module.exports = function (app, wss) {
                     type:'testMsg',
                     data:query.msg
                 });
+                setInterval(()=>{
+                    ws.sendJson({
+                        type:'testMsg',
+                        data:query.msg
+                    });
+                },1000)
             }
         })
 

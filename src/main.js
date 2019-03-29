@@ -32,7 +32,7 @@ async function connectWebsocket() {
         ws.onmessage = res => {
             console.log("收到socket消息:", res.data)
             var data = JSON.parse(res.data)
-            document.querySelector('#content').innerHTML = data.data;
+            document.querySelector('#content').innerHTML += data.data;
         };
     }
 
