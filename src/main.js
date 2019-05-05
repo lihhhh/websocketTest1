@@ -7,44 +7,34 @@ if (!Cookies.get('socketId')) {
     Cookies.set('socketId', uuid)
 }
 
-async function connectWebsocket() {
-    let res = await getRemoteConfig()
-    let data = res.data.data.row;
-    let url = `ws://${data.remoteIp}:${data.remotePort}`;
+function connectWebsocket() {
+    let url = `ws://${document.location.host}`;
 
-    var connect = function () {
-        var ws = new WebSocket(url);
+    var ws = new WebSocket(url);
 
-        ws.onopen = function () {
-            console.log("连接成功!");
-            ws.send(
-                JSON.stringify({
-                    type: "setSocketId",
-                    data: Cookies.get('socketId')
-                })
-            );
-        };
-        ws.onclose = function () {
-            // 关闭 websocket
-            console.log("连接已关闭...正在重连...");
-            connect()
-        };
-        ws.onmessage = res => {
-            console.log("收到socket消息:", res.data)
-            var data = JSON.parse(res.data)
-            document.querySelector('#content').innerHTML += data.data;
-        };
-    }
-
-    connect()
+    ws.onopen = function () {
+        console.log("连接成功!");
+        ws.send(
+            JSON.stringify({
+                type: "setSocketId",
+                data: Cookies.get('socketId')
+            })
+        );
+    };
+    ws.onclose = function () {
+        // 关闭 websocket
+        console.log("连接已关闭...正在重连...");
+        connectWebsocket()
+    };
+    ws.onmessage = res => {
+        console.log("收到socket消息:", res.data)
+        var data = JSON.parse(res.data)
+        document.querySelector('#content').innerHTML += data.data;
+    };
 }
 
 connectWebsocket()
 
-
-function getRemoteConfig() {
-    return axios.get('/api/server/config')
-}
 
 document.querySelector('button').onclick = function(){
     axios({
